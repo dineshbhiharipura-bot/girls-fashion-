@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Girls Fashion</title>
+<style>
+body{margin:0;background:#ffe6ee;font-family:Arial}
+.head{background:#ff2e7a;color:#fff;padding:12px;text-align:center;position:sticky;top:0;z-index:20}
+.filter{display:flex;gap:4px;justify-content:center;padding:8px;background:#fff;position:sticky;top:52px;z-index:15;overflow:auto}
+.filter button{padding:7px 9px;border-radius:20px;border:1px solid #ff2e7a;background:#fff;color:#ff2e7a;font-weight:700;font-size:9px;white-space:nowrap}
+.filter button.active{background:#ff2e7a;color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px #0001;position:relative}
+.off{position:absolute;top:5px;left:5px;background:#ff2e7a;color:#fff;font-size:10px;font-weight:800;padding:3px 6px;border-radius:5px}
+.imgbox{width:100%;height:300px;background:#fff;display:flex;justify-content:center;overflow:hidden}
+.imgbox img{width:100%;height:100%;object-fit:contain;object-position:top}
+.price{text-align:center;padding:5px 2px;line-height:14px}
+.price b{color:#c2185b;font-size:11px}
+.price s{color:#999;font-size:10px;margin-left:4px}
+.btn{background:#ff2e7a;color:#fff;border:0;width:92%;margin:6px 4% 8px;padding:10px;border-radius:8px;font-weight:700}
+#popup{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#000a;z-index:100;justify-content:center;align-items:center;padding:15px}
+.box{background:#fff;width:100%;max-width:380px;border-radius:15px;padding:15px;max-height:90vh;overflow:auto}
+.box img{width:100%;height:380px;object-fit:contain;border-radius:10px;background:#fff}
+.inp{width:92%;padding:12px;margin:6px 0;border:1px solid #ccc;border-radius:8px}
+.pbtn{width:100%;padding:14px;border:0;border-radius:10px;color:#fff;font-weight:800;margin:5px 0;font-size:16px}
+</style>
+</head>
+<body>
+<div class="head"><h2 style="margin:0">Girls Fashion</h2>Big Discount Sale</div>
+<div class="filter">
+<button class="active" onclick="filterProd('All',this)">All</button>
+<button onclick="filterProd('Dress',this)">Dress</button>
+<button onclick="filterProd('Shoes',this)">Shoes</button>
+<button onclick="filterProd('Bag',this)">Bag</button>
+<button onclick="filterProd('Watch',this)">Watch</button>
+<button onclick="filterProd('Earring',this)">Earring</button>
+<button onclick="filterProd('Kamarband',this)">Kamarband</button>
+<button onclick="filterProd('Nack Band',this)">Nack Band</button>
+<button onclick="filterProd('Panty Bra',this)">Panty Bra</button>
+</div>
+<div class="grid" id="grid"></div>
+<div id="popup"><div class="box" id="boxContent"></div></div>
+<script>
+let TOTAL=145;
+let grid=document.getElementById('grid');
+let selected={};
+let code="";
+for(let i=1;i<=TOTAL;i++){
+  let price, type, mrp;
+  if(i<=39){type="Dress"; price=549+(i*12); mrp=999;}
+  else if(i<=56){type="Shoes"; price=325+Math.round((i-40)*12.8); mrp=999; if(i==56) price=530;}
+  else if(i<=76){type="Bag"; price=350+(i-57)*21; mrp=899; if(i==76){price=749; mrp=1499;}}
+  else if(i<=93){type="Watch"; price=249+(i-77)*18; mrp=599; if(i==93) price=532;}
+  else if(i<=111){type="Earring"; price=152+Math.round((i-94)*6.5); mrp=399; if(i==111) price=263;}
+  else if(i<=118){type="Kamarband"; price=99+Math.round((i-112)*15); mrp=299; if(i==118) price=189;}
+  else if(i<=126){type="Nack Band"; price=99+Math.round((i-119)*14.2); mrp=399; if(i==126) price=199;}
+  else {type="Panty Bra"; price=145+Math.round((i-127)*5.05); mrp=499; if(i==145) price=236;}
+  let off=Math.round(((mrp-price)/mrp)*100);
+  code+=`<div class="card" data-type="${type}">
+    <div class="off">${off}% OFF</div>
+    <div class="imgbox"><img src="images/${i}.jpg"></div>
+    <div class="price"><b>${type} ₹${price}</b><s>₹${mrp}</s></div>
+    <button class="btn" onclick="openOrder(${i},${price},'${type}',${mrp},${off})">Order Now</button>
+  </div>`;
+}
+grid.innerHTML=code;
+function filterProd(type,btn){
+  document.querySelectorAll('.filter button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.card').forEach(card=>{
+    card.style.display=(type=='All'||card.dataset.type==type)?'block':'none';
+  });
+}
+function openOrder(id,price,type,mrp,off){
+  selected={id,price,type,mrp,off};
+  document.getElementById('popup').style.display='flex';
+  document.getElementById('boxContent').innerHTML=`
+    <img src="images/${id}.jpg">
+    <p style="text-align:center;font-weight:800;color:#c2185b;font-size:18px;margin:8px 0">${type} ₹${price} <s style="color:#999;font-size:14px">₹${mrp}</s> <span style="color:#fff;background:#ff2e7a;padding:2px 6px;border-radius:4px;font-size:12px">${off}% OFF</span></p>
+    <button class="pbtn" style="background:#5a2ea6" onclick="payNow()">PhonePe / GPay se Pay Kare</button>
+    <button class="pbtn" style="background:#777" onclick="closePop()">Close</button>
+  `;
+}
+function payNow(){
+  window.open('upi://pay?pa=8852073328@fam&pn=GirlsFashion&am='+selected.price+'&cu=INR&tn='+selected.type+' No '+selected.id);
+  // 2 sec baad UTR box dikhao
+  setTimeout(showUTRBox,1500);
+}
+function showUTRBox(){
+  document.getElementById('boxContent').innerHTML=`
+    <h3 style="color:#5a2ea6">Payment Ho Gaya?</h3>
+    <p>Apna 12 Digit ka UTR / Transaction ID niche dale:</p>
+    <img src="images/${selected.id}.jpg" style="height:100px">
+    <input id="utr" class="inp" placeholder="12 Digit UTR Number Dale * Ex: 123456789012">
+    <p style="font-size:12px;color:#777">UTR PhonePe / GPay me History me milega</p>
+    <button class="pbtn" style="background:#ff2e7a" onclick="verifyUTR()">UTR Submit Karo</button>
+  `;
+}
+function verifyUTR(){
+  let utr=document.getElementById('utr').value.trim();
+  if(utr.length < 10){alert("Sahi UTR dalo - 12 digit ka hota hai");return;}
+  // Check kahi pehle use to nahi hua
+  let usedUTRs = JSON.parse(localStorage.getItem('usedUTRs') || '[]');
+  if(usedUTRs.includes(utr)){
+    alert("⚠️ Ye UTR pehle hi use ho chuka hai! Ek UTR se 2 baar order nahi ho sakta.");
+    return;
+  }
+  selected.utr = utr;
+  showForm();
+}
+function showForm(){
+  document.getElementById('boxContent').innerHTML=`
+    <h3>${selected.type} Order - UTR: ${selected.utr}</h3>
+    <img src="images/${selected.id}.jpg" style="height:120px">
+    <p><b>${selected.type} No: ${selected.id} | ₹${selected.price} <s>₹${selected.mrp}</s> ${selected.off}% OFF</b></p>
+    <input id="name" class="inp" placeholder="Naam *">
+    <input id="mobile" class="inp" placeholder="Mobile *">
+    <input id="house" class="inp" placeholder="House / Village">
+    <input id="city" class="inp" placeholder="District *">
+    <input id="state" class="inp" placeholder="State *">
+    <input id="pin" class="inp" placeholder="Pincode *">
+    <button class="pbtn" style="background:#25D366" onclick="sendToWhatsApp()">Order Confirm Karo</button>
+  `;
+}
+function sendToWhatsApp(){
+  let n=document.getElementById('name').value;
+  let m=document.getElementById('mobile').value;
+  let h=document.getElementById('house').value;
+  let c=document.getElementById('city').value;
+  let s=document.getElementById('state').value;
+  let p=document.getElementById('pin').value;
+  if(!n||!m||!c||!s||!p){alert("Sab * wale bhare");return;}
+  // UTR ko save karo taaki dobara use na ho
+  let usedUTRs = JSON.parse(localStorage.getItem('usedUTRs') || '[]');
+  usedUTRs.push(selected.utr);
+  localStorage.setItem('usedUTRs', JSON.stringify(usedUTRs));
+
+  let msg=`*NEW PAID ORDER*%0A${selected.type} No: ${selected.id}%0APrice: ₹${selected.price} (MRP ₹${selected.mrp})%0ADiscount: ${selected.off}% OFF%0A*UTR:* ${selected.utr}%0AName: ${n}%0AMobile: ${m}%0AAddress: ${h}, ${c}, ${s} - ${p}`;
+  window.open('https://wa.me/917665976027?text='+msg);
+  closePop();
+}
+function closePop(){document.getElementById('popup').style.display='none';}
+</script>
+</body>
+</html>
